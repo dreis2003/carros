@@ -5,6 +5,8 @@ import 'package:carros/widgets/app_button.dart';
 import 'package:carros/widgets/app_text.dart';
 import 'package:flutter/material.dart';
 
+import 'package:carros/model/usuario.dart';
+
 class LoginPage extends StatefulWidget {
   @override
   _LoginPageState createState() => _LoginPageState();
@@ -78,8 +80,13 @@ class _LoginPageState extends State<LoginPage> {
     String senha = _tSenha.text;
 
     print("Login: $login, Senha: $senha");
-    bool ok = await LoginApi.login(login, senha);
-    push(context, HomePage());
+    Usuario usuario = await LoginApi.login(login, senha);
+    if (usuario != null) {
+      print(">> $usuario");
+      push(context, HomePage());
+    } else {
+      print("Login incorreto");
+    }
   }
 
   String _validateLogin(String texto) {

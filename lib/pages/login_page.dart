@@ -1,11 +1,13 @@
+import 'package:carros/model/usuario.dart';
 import 'package:carros/pages/home_page.dart';
 import 'package:carros/pages/login_api.dart';
+import 'package:carros/utils/alert.dart';
 import 'package:carros/utils/nav.dart';
 import 'package:carros/widgets/app_button.dart';
 import 'package:carros/widgets/app_text.dart';
 import 'package:flutter/material.dart';
 
-import 'package:carros/model/usuario.dart';
+import 'package:carros/model/api_response.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -20,6 +22,8 @@ class _LoginPageState extends State<LoginPage> {
   final _tSenha = TextEditingController();
 
   final _focusSenha = FocusNode();
+
+  bool _showProgress = false;
 
   @override
   Widget build(BuildContext context) {
@@ -65,6 +69,7 @@ class _LoginPageState extends State<LoginPage> {
             AppButton(
               "Login",
               onPressed: _onClickLogin,
+              showProgress: _showProgress,
             ),
           ],
         ),
@@ -80,13 +85,22 @@ class _LoginPageState extends State<LoginPage> {
     String senha = _tSenha.text;
 
     print("Login: $login, Senha: $senha");
-    Usuario usuario = await LoginApi.login(login, senha);
-    if (usuario != null) {
+    setState(() {
+      _showProgress = true;
+    });
+    ApiResponse response = await LoginApi.login(login, senha);
+
+    if (response.ok) {
+      Usuario usuario = response.result;
       print(">> $usuario");
+
       push(context, HomePage());
     } else {
-      print("Login incorreto");
+      alert(context, response.msg);
     }
+    setState(() {
+      _showProgress = false;
+    });
   }
 
   String _validateLogin(String texto) {

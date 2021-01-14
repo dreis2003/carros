@@ -1,6 +1,6 @@
 import 'package:carros/model/usuario.dart';
 import 'package:carros/pages/home_page.dart';
-import 'package:carros/pages/login_api.dart';
+import 'package:carros/pages/login/login_api.dart';
 import 'package:carros/utils/alert.dart';
 import 'package:carros/utils/nav.dart';
 import 'package:carros/widgets/app_button.dart';
@@ -94,7 +94,7 @@ class _LoginPageState extends State<LoginPage> {
       Usuario usuario = response.result;
       print(">> $usuario");
 
-      push(context, HomePage());
+      push(context, HomePage(), replace: true);
     } else {
       alert(context, response.msg);
     }

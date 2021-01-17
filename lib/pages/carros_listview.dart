@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:carros/model/carro.dart';
 import 'package:carros/services/carros_api.dart';
 
+// ignore: must_be_immutable
 class CarrosListView extends StatefulWidget {
   String tipo;
 

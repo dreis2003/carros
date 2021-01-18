@@ -1,3 +1,7 @@
+import 'dart:async';
+
+import 'package:carros/pages/carros/carro_page.dart';
+import 'package:carros/utils/nav.dart';
 import 'package:flutter/material.dart';
 
 import 'package:carros/model/carro.dart';
@@ -15,16 +19,26 @@ class CarrosListView extends StatefulWidget {
 
 class _CarrosListViewState extends State<CarrosListView>
     with AutomaticKeepAliveClientMixin<CarrosListView> {
+  List<Carro> carros;
+  final _streamController = StreamController<List<Carro>>();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  _loadData() async {
+    carros = await CarrosApi.getCarros(widget.tipo);
+    _streamController.add(carros);
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return _body();
-  }
 
-  _body() {
-    Future<List<Carro>> future = CarrosApi.getCarros(widget.tipo);
-    return FutureBuilder(
-      future: future,
+    return StreamBuilder(
+      stream: _streamController.stream,
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           print(snapshot.error);
@@ -42,7 +56,7 @@ class _CarrosListViewState extends State<CarrosListView>
             child: CircularProgressIndicator(),
           );
         }
-        List<Carro> carros = snapshot.data;
+
         return _listView(carros);
       },
     );
@@ -87,9 +101,7 @@ class _CarrosListViewState extends State<CarrosListView>
                       children: <Widget>[
                         FlatButton(
                           child: const Text('DETALHES'),
-                          onPressed: () {
-                            /* ... */
-                          },
+                          onPressed: () => _onClickCarro(carro),
                         ),
                         FlatButton(
                           child: const Text('SHARE'),
@@ -111,4 +123,14 @@ class _CarrosListViewState extends State<CarrosListView>
 
   @override
   bool get wantKeepAlive => true;
+
+  _onClickCarro(Carro carro) {
+    push(context, CarroPage(carro));
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _streamController.close();
+  }
 }

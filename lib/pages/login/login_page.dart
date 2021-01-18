@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:carros/model/usuario.dart';
 import 'package:carros/pages/home_page.dart';
 import 'package:carros/pages/login/login_api.dart';
@@ -15,6 +17,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  final _streamController = StreamController<bool>();
   final _formKey = GlobalKey<FormState>();
 
   final _tLogin = TextEditingController();
@@ -22,8 +25,6 @@ class _LoginPageState extends State<LoginPage> {
   final _tSenha = TextEditingController();
 
   final _focusSenha = FocusNode();
-
-  bool _showProgress = false;
 
   @override
   void initState() {
@@ -77,11 +78,15 @@ class _LoginPageState extends State<LoginPage> {
             SizedBox(
               height: 20,
             ),
-            AppButton(
-              "Login",
-              onPressed: _onClickLogin,
-              showProgress: _showProgress,
-            ),
+            StreamBuilder<bool>(
+                stream: _streamController.stream,
+                builder: (context, snapshot) {
+                  return AppButton(
+                    "Login",
+                    onPressed: _onClickLogin,
+                    showProgress: snapshot.data ?? false,
+                  );
+                })
           ],
         ),
       ),
@@ -96,9 +101,7 @@ class _LoginPageState extends State<LoginPage> {
     String senha = _tSenha.text;
 
     print("Login: $login, Senha: $senha");
-    setState(() {
-      _showProgress = true;
-    });
+    _streamController.sink.add(true);
     ApiResponse response = await LoginApi.login(login, senha);
 
     if (response.ok) {
@@ -109,9 +112,7 @@ class _LoginPageState extends State<LoginPage> {
     } else {
       alert(context, response.msg);
     }
-    setState(() {
-      _showProgress = false;
-    });
+    _streamController.sink.add(false);
   }
 
   String _validateLogin(String texto) {
@@ -129,5 +130,11 @@ class _LoginPageState extends State<LoginPage> {
       return "A senha precisa ter pelo menos 3 números";
     }
     return null;
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _streamController.close();
   }
 }

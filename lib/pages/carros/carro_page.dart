@@ -11,6 +11,26 @@ class CarroPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(carro.nome),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.place),
+            onPressed: _onClickMapa,
+          ),
+          IconButton(
+            icon: Icon(Icons.videocam),
+            onPressed: _onClickVideo,
+          ),
+          PopupMenuButton<String>(
+            onSelected: _onClickPopupMenu,
+            itemBuilder: (BuildContext context) {
+              return [
+                PopupMenuItem(value: "Editar", child: Text("Editar")),
+                PopupMenuItem(value: "Deletar", child: Text("Deletar")),
+                PopupMenuItem(value: "Share", child: Text("Compartilhar")),
+              ];
+            },
+          ),
+        ],
       ),
       body: _body(),
     );
@@ -21,5 +41,13 @@ class CarroPage extends StatelessWidget {
       padding: EdgeInsets.all(16),
       child: Image.network(carro.urlFoto),
     );
+  }
+
+  void _onClickMapa() {}
+
+  void _onClickVideo() {}
+
+  _onClickPopupMenu(String value) {
+    print(value);
   }
 }

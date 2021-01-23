@@ -3,53 +3,15 @@ import 'package:carros/utils/nav.dart';
 import 'package:flutter/material.dart';
 
 import 'package:carros/model/carro.dart';
-import 'carros_bloc.dart';
-import 'package:carros/widgets/text_error.dart';
 
 // ignore: must_be_immutable
-class CarrosListView extends StatefulWidget {
-  String tipo;
+class CarrosListView extends StatelessWidget {
+  List<Carro> carros;
 
-  CarrosListView(this.tipo);
-
-  @override
-  _CarrosListViewState createState() => _CarrosListViewState();
-}
-
-class _CarrosListViewState extends State<CarrosListView>
-    with AutomaticKeepAliveClientMixin<CarrosListView> {
-  //List<Carro> carros;
-
-  final _bloc = CarrosBloc();
-
-  @override
-  void initState() {
-    _bloc.fetch(widget.tipo);
-  }
+  CarrosListView(this.carros);
 
   @override
   Widget build(BuildContext context) {
-    super.build(context);
-
-    return StreamBuilder(
-      stream: _bloc.stream,
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          print(snapshot.error);
-          return TextError("Não foi possível buscar os carros");
-        }
-        if (!snapshot.hasData) {
-          return Center(
-            child: CircularProgressIndicator(),
-          );
-        }
-        List<Carro> carros = snapshot.data;
-        return _listView(carros);
-      },
-    );
-  }
-
-  Container _listView(List<Carro> carros) {
     return Container(
       padding: EdgeInsets.all(16),
       child: ListView.builder(
@@ -88,7 +50,7 @@ class _CarrosListViewState extends State<CarrosListView>
                       children: <Widget>[
                         FlatButton(
                           child: const Text('DETALHES'),
-                          onPressed: () => _onClickCarro(carro),
+                          onPressed: () => _onClickCarro(context, carro),
                         ),
                         FlatButton(
                           child: const Text('SHARE'),
@@ -111,13 +73,7 @@ class _CarrosListViewState extends State<CarrosListView>
   @override
   bool get wantKeepAlive => true;
 
-  _onClickCarro(Carro carro) {
+  _onClickCarro(context, Carro carro) {
     push(context, CarroPage(carro));
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _bloc.dispose();
   }
 }
